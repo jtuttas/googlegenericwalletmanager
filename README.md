@@ -12,5 +12,5 @@ Type in you Wallet Issuer ID, Your Wallet Class ID and upload your application c
 ## Docker Image
 The application is also available as a docker container. If you prefer to use the docker container simply run:
 ```
-docker run -it -p 3000:3000 tuttas/walletmanager
+docker run -it -p 3000:3000 tuttas/googlewalletclassmanager
 ```

@@ -26,8 +26,8 @@ docker pushdocker:
     - master
   script:
     - echo "$DOCKER_REGISTRY" | docker login -u tuttas --password-stdin 
-    - docker build -t tuttas/googlewalletcassmanager  .
-    - docker push tuttas/googlewalletcassmanager 
+    - docker build -t tuttas/googlewalletclassmanager  .
+    - docker push tuttas/googlewalletclassmanager 
   tags:
     - myrunner
 
