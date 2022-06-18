@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Manager</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style>
+    textarea {
+        border: 1px solid #999999;
+        width: 100%;
+        margin: 5px 0;
+        padding: 3px;
+    }
+
+    .err {
+        color: red;
+    }
+
+    .ok {
+        color: green;
+    }
+</style>
+
+<body>
+    <div class="jumbotron">
+        <h1>Google generic Wallet Manager</h1>
+    </div>
+    <form>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-group">
+                <label for="WALLET_ISSUER_ID">WALLET_ISSUER_ID</label>
+                <input type="text" class="form-control" id="WALLET_ISSUER_ID" value=""
+                    placeholder="WALLET_ISSUER_ID">
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="form-group">
+                <label for="WALLET_CLASS_ID">WALLET_CLASS_ID</label>
+                <input type="test" class="form-control" id="WALLET_CLASS_ID" placeholder="WALLET_CLASS_ID"
+                    value="">
+            </div>
+        </div>
+    </form>
+    <form>
+        <div class="form-group">
+
+            <div class="col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                <label for="file">GOOGLE_APPLICATION_CREDENTIALS</label>
+                <input type="file" accept=".json" class="form-control" id="file" name="file"
+                    placeholder="GOOGLE_APPLICATION_CREDENTIALS" value="ausweis">
+            </div>
+
+            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                <br>
+                <button id="but_upload" type="button" class="btn btn-lg btn-danger">upload</button>
+            </div>
+        </div>
+    </form>
+
+
+    </div>
+    <br>
+    <div class="row">
+       
+        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+            
+        </div>
+        
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <a id="readclass" href="#" class="btn btn-primary">Read Class</a>
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <button id="writeclass" type="button" class="btn btn-primary"> Write Class</button>
+        </div>
+        <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+            <button id="updateclass" type="button" class="btn btn-primary"> Update Class</button>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <textarea name="class" id="inputmyclass" rows="15"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <p id="errmsg"></p>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).ready(function () {
+
+        $("#but_upload").click(function () {
+            $("#errmsg").removeClass("err")
+            $("#errmsg").removeClass("ok")
+
+            var fd = new FormData();
+            var files = $('#file')[0].files;
+
+            // Check file selected or not
+            if (files.length > 0) {
+                fd.append('file', files[0]);
+
+                $.ajax({
+                    url: '/upload',
+                    type: 'post',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        console.log('Success:' + JSON.stringify(response));
+                        $("#errmsg").addClass("ok")
+                        $("#errmsg").text("JSON File successfully uploaded!")
+                    },
+                    error: function (err) {
+
+                        console.log('Error:' + JSON.stringify(err));
+                        $("#errmsg").addClass("err")
+                        $("#errmsg").text("Error uploading JSON file:" + JSON.stringify(err))
+                    }
+                });
+            } else {
+                alert("Please select a file.");
+            }
+        });
+        $("#readclass").click(function (e) {
+            $("#errmsg").removeClass("err")
+            $("#errmsg").removeClass("ok")
+            $.getJSON("/googlegetclass?id=" + $("#WALLET_ISSUER_ID").val() + "&class=" + $("#WALLET_CLASS_ID").val(), function (data) {
+                console.log('Receive:' + JSON.stringify(data));
+                $("#inputmyclass").val(JSON.stringify(data.data, null, 2))
+                $("#errmsg").addClass("ok")
+                $("#errmsg").text("")
+
+            }).fail(function (e) {
+                console.log('Error' + JSON.stringify(e));
+                $("#errmsg").addClass("err")
+                $("#errmsg").text(e.responseJSON.msg)
+            });
+        });
+
+        $("#writeclass").click(function (e) {
+            $("#errmsg").removeClass("err")
+            $("#errmsg").removeClass("ok")
+            try {
+                var obj = JSON.parse($("#inputmyclass").val())
+                $.post("/googlecreatclass?id=" + $("#WALLET_ISSUER_ID").val() + "&class=" + $("#WALLET_CLASS_ID").val(), JSON.parse($("#inputmyclass").val()))
+                    .done(function (msg) {
+                        console.log('DONE:' + JSON.stringify(msg));
+                        $("#errmsg").addClass("ok")
+                        $("#errmsg").text("Class successfully created!")
+                    })
+                    .fail(function (response) {
+                        console.log('Error:: ' + JSON.stringify(response));
+                        $("#errmsg").addClass("err")
+                        $("#errmsg").text(response.responseText)
+                    });
+            }
+            catch (e) {
+                console.log('Error! ' + e);
+                $("#errmsg").addClass("err")
+                $("#errmsg").text("Error:" + e)
+            }
+        });
+        $("#updateclass").click(function (e) {
+            $("#errmsg").removeClass("err")
+            $("#errmsg").removeClass("ok")
+            try {
+                var obj = JSON.parse($("#inputmyclass").val())
+                $.post("/googleupdateclass?id=" + $("#WALLET_ISSUER_ID").val() + "&class=" + $("#WALLET_CLASS_ID").val(), JSON.parse($("#inputmyclass").val()))
+                    .done(function (msg) {
+                        console.log('DONE:' + JSON.stringify(msg));
+                        $("#errmsg").addClass("ok")
+                        $("#errmsg").text("class successfully updated")
+                    })
+                    .fail(function (response) {
+                        console.log('Error:: ' + JSON.stringify(response));
+                        $("#errmsg").addClass("err")
+                        $("#errmsg").text(response.responseText)
+                    });
+            }
+            catch (e) {
+                console.log('Error! ' + e);
+                $("#errmsg").addClass("err")
+                $("#errmsg").text("Error:" + e)
+            }
+        });
+    });
+</script>
+
+</html>
