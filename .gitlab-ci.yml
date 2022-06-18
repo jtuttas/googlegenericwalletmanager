@@ -4,7 +4,7 @@ variables:
 
 stages:
   - Push to local Registry
-  - Push tp docker hub
+  - Push to docker hub
 
 
 docker pushlocal:
@@ -21,7 +21,7 @@ docker pushlocal:
 
 docker pushdocker:
   image: docker:stable
-  stage: Push to docker
+  stage: Push to docker hub
   only:
     - master
   script:
