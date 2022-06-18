@@ -1,6 +1,6 @@
 # Google generic Wallet Class Manager
 
-This Project realized a small frontend to Manage google generic wallet classes. The Classes can be uploaded, downloaded or update.
+This project realized a small frontend to manage google generic wallet classes. The classes can be uploaded, downloaded or updated.
 
 ## Installation
 After clone the repository, you need to install the dependencies with **npm install**. After this you can run the server with **node app.js**. The Server runs und port 3000. To visit the Server go to [http://localhost:3000](http://localhost:3000).
