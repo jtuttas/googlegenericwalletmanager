@@ -1,4 +1,4 @@
-# Google generich Wallet Class Manager
+# Google generic Wallet Class Manager
 
 This Project realized a small frontend to Manage google generic wallet classes. The Classes can be uploaded, downloaded or update.
 
