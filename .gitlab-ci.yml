@@ -1,0 +1,33 @@
+variables:
+  DOCKER_HOST: tcp://192.168.178.29:2375
+
+
+stages:
+  - Push to local Registry
+  - Push tp docker hub
+
+
+docker pushlocal:
+  image: docker:stable
+  stage: Push to local Registry
+  only:
+    - master
+  script:
+    - echo "$LOCAL_REGISTRY" | docker login -u root --password-stdin service.joerg-tuttas.de:5555
+    - docker build -t service.joerg-tuttas.de:5555/root/googlewalletcassmanager  .
+    - docker push service.joerg-tuttas.de:5555/root/googlewalletcassmanager 
+  tags:
+    - myrunner
+
+docker pushdocker:
+  image: docker:stable
+  stage: Push to docker
+  only:
+    - master
+  script:
+    - echo "$DOCKER_REGISTRY" | docker login -u tuttas --password-stdin 
+    - docker build -t tuttas/googlewalletcassmanager  .
+    - docker push tuttas/googlewalletcassmanager 
+  tags:
+    - myrunner
+
